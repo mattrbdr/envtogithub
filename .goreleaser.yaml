@@ -34,8 +34,6 @@ release:
 
 brews:
   - name: etg
-    ids:
-      - etg
     repository:
       owner: mattrbdr
       name: homebrew-tap
