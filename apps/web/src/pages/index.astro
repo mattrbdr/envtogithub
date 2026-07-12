@@ -1,20 +1,20 @@
 ---
-const install = `git clone https://github.com/mattrbdr/envtogithub.git
-cd envtogithub/packages/cli
-go install ./cmd/etg`;
+const install = `brew tap mattrbdr/tap
+brew install etg`;
 const example = `# env.production.to.github
 DATABASE_URL="postgres://..."
 STRIPE_SECRET_KEY=sk_live_...`;
 const run = `gh auth login
+etg info
 etg --dry-run
 etg`;
 ---
 
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="description" content="etg synchronise les secrets GitHub depuis un fichier d'environnement." />
+    <meta name="description" content="Sync GitHub environment secrets from a local env file." />
     <meta name="theme-color" content="#fcfcfb" />
     <title>etg — env to GitHub</title>
     <style>
@@ -36,32 +36,32 @@ etg`;
     <main>
       <a class="brand" href="#top"><span class="mark">$</span> etg</a>
       <div id="top" class="eyebrow">env to GitHub</div>
-      <h1>Synchronisez vos secrets GitHub depuis un fichier d’environnement.</h1>
-      <p class="intro">etg lit <code>env.&lt;environment&gt;.to.github</code>, puis crée ou met à jour les secrets de l’environnement GitHub correspondant. Simple, explicite, sans copier-coller.</p>
-      <div class="links"><a href="#install">Installer etg</a><a href="#usage">Voir un exemple ↓</a></div>
+      <h1>GitHub environment secrets, without the busywork.</h1>
+      <p class="intro">etg turns a local <code>env.&lt;environment&gt;.to.github</code> file into GitHub environment secrets. Review the change, then sync it with one command.</p>
+      <div class="links"><a href="#install">Install with Homebrew</a><a href="#usage">See how it works ↓</a></div>
 
       <section>
-        <h2>Ce que fait etg</h2>
-        <ul><li>Un fichier par environnement — production, staging, preview…</li><li>Un <code>--dry-run</code> qui montre les clés sans afficher leurs valeurs.</li><li>La CLI <code>gh</code> existante pour l’authentification et la synchronisation.</li></ul>
+        <h2>Small, deliberate, and safe by default.</h2>
+        <ul><li>One local file for each environment: production, staging, preview, and more.</li><li><code>--dry-run</code> previews key names and value lengths—never secret values.</li><li>Built on the GitHub CLI you already use, so authentication stays simple.</li></ul>
       </section>
 
       <section id="usage">
-        <h2>Utilisation</h2>
-        <p>Créez un fichier local pour l’environnement voulu.</p>
+        <h2>How it works</h2>
+        <p>Create a local file for the environment you want to update.</p>
         <pre>{example}</pre>
-        <div class="steps"><div class="step"><span class="number">01</span><div><h3>Prévisualisez</h3><p><code>etg --dry-run</code> liste les clés qui seraient envoyées, sans contacter GitHub.</p></div></div><div class="step"><span class="number">02</span><div><h3>Synchronisez</h3><p><code>etg</code> crée ou met à jour chaque secret dans l’environnement <code>production</code>.</p></div></div></div>
+        <div class="steps"><div class="step"><span class="number">01</span><div><h3>Preview first</h3><p>Run <code>etg --dry-run</code> to see exactly which keys are ready to sync. Nothing is sent to GitHub.</p></div></div><div class="step"><span class="number">02</span><div><h3>Sync when ready</h3><p>Run <code>etg</code>. Existing secrets are updated and missing ones are created in the matching <code>production</code> environment.</p></div></div><div class="step"><span class="number">03</span><div><h3>Inspect remotely</h3><p>Use <code>etg info</code> for available environments and <code>etg list production</code> for secret names.</p></div></div></div>
       </section>
 
       <section id="install">
-        <h2>Installation</h2>
-        <p>etg nécessite Go 1.22+ et la GitHub CLI. Connectez d’abord votre compte GitHub, puis installez le binaire depuis les sources.</p>
+        <h2>Install</h2>
+        <p>Install etg with Homebrew, then connect the GitHub CLI to the account and repository you want to manage.</p>
         <pre>{install}</pre>
         <pre>{run}</pre>
-        <p class="muted">Une formule Homebrew est prévue. Pour l’instant, l’installation depuis les sources est la méthode officielle.</p>
-        <div class="note">Ne versionnez jamais les valeurs réelles. Les fichiers <code>env.*.to.github</code> sont ignorés par Git ; conservez uniquement un fichier <code>.example</code> partageable.</div>
+        <p class="muted">Requires the <a href="https://cli.github.com/" target="_blank" rel="noreferrer">GitHub CLI</a>. etg uses your active <code>gh</code> session—there is no separate account to configure.</p>
+        <div class="note">Keep real values local. <code>env.*.to.github</code> files are ignored by Git; commit a safe <code>.example</code> file instead.</div>
       </section>
 
-      <footer class="footer">etg · env to GitHub · Des secrets synchronisés, pas copiés-collés.</footer>
+      <footer class="footer">etg · env to GitHub · <a href="https://github.com/mattrbdr/envtogithub">View the project on GitHub</a></footer>
     </main>
   </body>
 </html>
