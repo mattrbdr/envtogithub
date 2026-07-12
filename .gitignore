@@ -5,5 +5,6 @@ coverage/
 .DS_Store
 session-*.md
 *.env
+!.github/deploy/o2switch-production.env
 env.*.to.github
 !env.*.to.github.example
