@@ -1,0 +1,11 @@
+{
+  "name": "env-to-github",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "npm run dev --workspace @etg/web",
+    "check": "npm run check --workspace @etg/web",
+    "build": "npm run build --workspace @etg/web",
+    "test:cli": "cd packages/cli && go test ./..."
+  }
+}

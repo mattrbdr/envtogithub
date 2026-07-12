@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+coverage/
+.DS_Store
+session-*.md
+*.env
+env.*.to.github
+!env.*.to.github.example

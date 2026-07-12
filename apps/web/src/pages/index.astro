@@ -1,0 +1,67 @@
+---
+const install = `git clone https://github.com/mattrbdr/envtogithub.git
+cd envtogithub/packages/cli
+go install ./cmd/etg`;
+const example = `# env.production.to.github
+DATABASE_URL="postgres://..."
+STRIPE_SECRET_KEY=sk_live_...`;
+const run = `gh auth login
+etg --dry-run
+etg`;
+---
+
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="etg synchronise les secrets GitHub depuis un fichier d'environnement." />
+    <meta name="theme-color" content="#fcfcfb" />
+    <title>etg — env to GitHub</title>
+    <style>
+      :root { background: #fcfcfb; color: #202124; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; } html { scroll-behavior: smooth; } body { margin: 0; }
+      main { margin: 0 auto; max-width: 760px; padding: 76px 28px 110px; }
+      a { color: #146c43; text-underline-offset: 3px; } code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .brand { align-items: center; color: #202124; display: flex; font-size: 1.06rem; font-weight: 750; gap: 9px; letter-spacing: -.02em; text-decoration: none; }.mark { background: #202124; border-radius: 5px; color: #fff; font-family: ui-monospace, monospace; font-size: .75rem; padding: 4px 6px; }
+      .eyebrow { color: #687076; font-size: .86rem; margin: 64px 0 15px; } h1 { font-size: clamp(2.65rem, 8vw, 4.4rem); letter-spacing: -.065em; line-height: .98; margin: 0; max-width: 650px; } .intro { color: #5b6166; font-size: 1.16rem; line-height: 1.65; margin: 25px 0 0; max-width: 620px; }
+      .links { display: flex; flex-wrap: wrap; gap: 18px; margin: 28px 0 58px; }.links a { font-size: .93rem; font-weight: 650; }.links a:first-child { background: #202124; border-radius: 6px; color: #fff; padding: 10px 14px; text-decoration: none; }
+      section { border-top: 1px solid #dedfdf; padding: 42px 0; } h2 { font-size: 1.38rem; letter-spacing: -.03em; margin: 0 0 14px; } h3 { font-size: 1rem; margin: 0 0 5px; } p { color: #555b60; line-height: 1.65; margin: 0 0 16px; } ul { color: #555b60; line-height: 1.8; margin: 0; padding-left: 20px; }
+      pre { background: #f3f4f3; border: 1px solid #e2e4e2; border-radius: 7px; color: #303437; font-size: .84rem; line-height: 1.75; margin: 20px 0 0; overflow: auto; padding: 18px; } .muted { color: #747b80; font-size: .88rem; margin-top: 14px; }
+      .steps { display: grid; gap: 23px; margin-top: 24px; }.step { display: grid; gap: 14px; grid-template-columns: 27px 1fr; }.number { color: #146c43; font-family: ui-monospace, monospace; font-size: .84rem; font-weight: 700; padding-top: 2px; }.step p { font-size: .94rem; margin: 0; }
+      .note { background: #f5faf6; border-left: 3px solid #4ba66e; color: #395443; font-size: .92rem; line-height: 1.55; margin-top: 25px; padding: 13px 15px; }.footer { color: #858b90; font-size: .82rem; padding-top: 30px; }
+      @media (max-width: 560px) { main { padding: 42px 21px 75px; }.eyebrow { margin-top: 50px; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="brand" href="#top"><span class="mark">$</span> etg</a>
+      <div id="top" class="eyebrow">env to GitHub</div>
+      <h1>Synchronisez vos secrets GitHub depuis un fichier d’environnement.</h1>
+      <p class="intro">etg lit <code>env.&lt;environment&gt;.to.github</code>, puis crée ou met à jour les secrets de l’environnement GitHub correspondant. Simple, explicite, sans copier-coller.</p>
+      <div class="links"><a href="#install">Installer etg</a><a href="#usage">Voir un exemple ↓</a></div>
+
+      <section>
+        <h2>Ce que fait etg</h2>
+        <ul><li>Un fichier par environnement — production, staging, preview…</li><li>Un <code>--dry-run</code> qui montre les clés sans afficher leurs valeurs.</li><li>La CLI <code>gh</code> existante pour l’authentification et la synchronisation.</li></ul>
+      </section>
+
+      <section id="usage">
+        <h2>Utilisation</h2>
+        <p>Créez un fichier local pour l’environnement voulu.</p>
+        <pre>{example}</pre>
+        <div class="steps"><div class="step"><span class="number">01</span><div><h3>Prévisualisez</h3><p><code>etg --dry-run</code> liste les clés qui seraient envoyées, sans contacter GitHub.</p></div></div><div class="step"><span class="number">02</span><div><h3>Synchronisez</h3><p><code>etg</code> crée ou met à jour chaque secret dans l’environnement <code>production</code>.</p></div></div></div>
+      </section>
+
+      <section id="install">
+        <h2>Installation</h2>
+        <p>etg nécessite Go 1.22+ et la GitHub CLI. Connectez d’abord votre compte GitHub, puis installez le binaire depuis les sources.</p>
+        <pre>{install}</pre>
+        <pre>{run}</pre>
+        <p class="muted">Une formule Homebrew est prévue. Pour l’instant, l’installation depuis les sources est la méthode officielle.</p>
+        <div class="note">Ne versionnez jamais les valeurs réelles. Les fichiers <code>env.*.to.github</code> sont ignorés par Git ; conservez uniquement un fichier <code>.example</code> partageable.</div>
+      </section>
+
+      <footer class="footer">etg · env to GitHub · Des secrets synchronisés, pas copiés-collés.</footer>
+    </main>
+  </body>
+</html>
