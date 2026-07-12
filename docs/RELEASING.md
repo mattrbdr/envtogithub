@@ -24,7 +24,15 @@ ARM64, puis attache les archives et `checksums.txt` à la GitHub Release.
 
 ## Homebrew
 
-La release initiale publie les binaires GitHub. Pour une formule Homebrew,
-créez ensuite un dépôt de tap (par exemple `homebrew-tap`) et ajoutez la cible
-`brews` correspondante dans `.goreleaser.yaml`, avec un token dédié ayant accès
-en écriture au tap.
+Le tap public [mattrbdr/homebrew-tap](https://github.com/mattrbdr/homebrew-tap)
+est configuré dans `.goreleaser.yaml`. Avant de publier la première release,
+créez un fine-grained personal access token GitHub autorisé à écrire le contenu
+du dépôt `mattrbdr/homebrew-tap`, puis enregistrez-le comme secret Actions
+`HOMEBREW_TAP_GITHUB_TOKEN` dans `mattrbdr/envtogithub`.
+
+Après une release stable, les utilisateurs pourront installer la CLI avec :
+
+```bash
+brew tap mattrbdr/tap
+brew install etg
+```

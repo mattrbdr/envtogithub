@@ -31,3 +31,21 @@ changelog:
 release:
   draft: false
   prerelease: auto
+
+brews:
+  - name: etg
+    ids:
+      - etg
+    repository:
+      owner: mattrbdr
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/mattrbdr/envtogithub"
+    description: "Sync local environment files with GitHub environment secrets"
+    license: "MIT"
+    install: |-
+      bin.install "etg"
+    test: |
+      system "#{bin}/etg", "help"
+    skip_upload: auto

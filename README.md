@@ -62,6 +62,13 @@ go build -o etg ./cmd/etg
 Les tags `v*` déclenchent GoReleaser et publient les binaires macOS/Linux dans
 une GitHub Release. Voir [la procédure de release](docs/RELEASING.md).
 
+Après la première release, installez etg avec Homebrew :
+
+```bash
+brew tap mattrbdr/tap
+brew install etg
+```
+
 ## Site
 
 Le site Astro de présentation vit dans `apps/web`.
