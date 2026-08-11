@@ -97,6 +97,15 @@ jobs:
           RUNNER_IP="$(curl --fail --silent --show-error --retry 3 https://api.ipify.org)"
           echo "RUNNER_IP=$RUNNER_IP" >> "$GITHUB_ENV"
 
+      - name: Clear previous SSH exceptions
+        run: |
+          set -euo pipefail
+          CLEANUP_RESPONSE="$(curl --fail --silent --show-error --max-time 45 \
+            -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
+            "https://$CPANEL_HOST:2083/execute/SshWhitelist/remove_all")"
+          echo "$CLEANUP_RESPONSE"
+          echo "$CLEANUP_RESPONSE" | jq -e '.status == 1' > /dev/null
+
       - name: Whitelist runner IP for SSH
         run: |
           set -euo pipefail
@@ -104,7 +113,7 @@ jobs:
             -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
             "https://$CPANEL_HOST:2083/execute/SshWhitelist/add?address=$RUNNER_IP&port=22")"
           echo "$WHITELIST_RESPONSE"
-          echo "$WHITELIST_RESPONSE" | jq -e '.result.status == 1' > /dev/null
+          echo "$WHITELIST_RESPONSE" | jq -e '.status == 1' > /dev/null
 
       - name: Set up SSH key
         run: |
@@ -187,10 +196,13 @@ jobs:
             fi
           EOF
 
-      - name: Remove runner IP and SSH key
+      - name: Clear SSH exceptions and remove SSH key
         if: always()
         run: |
-          curl --silent --show-error --max-time 45 \
+          CLEANUP_RESPONSE="$(curl --silent --show-error --max-time 45 \
             -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
-            "https://$CPANEL_HOST:2083/execute/SshWhitelist/remove?address=$RUNNER_IP&port=22" || true
+            "https://$CPANEL_HOST:2083/execute/SshWhitelist/remove_all" || true)"
+          if [ -n "$CLEANUP_RESPONSE" ]; then
+            echo "$CLEANUP_RESPONSE"
+          fi
           rm -rf ~/.ssh

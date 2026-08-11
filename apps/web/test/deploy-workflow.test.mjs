@@ -16,3 +16,9 @@ test('production deployment verifies SSH access after whitelisting before backin
   assert.match(workflow, /for attempt in \{1\.\.6\}/)
   assert.match(workflow, /SSH remained unreachable after whitelisting/)
 })
+
+test('production deployment removes stale SSH exceptions before and after each run', () => {
+  assert.match(workflow, /SshWhitelist\/remove_all/)
+  assert.match(workflow, /if: always\(\)/)
+  assert.match(workflow, /jq -e '\.status == 1'/)
+})
