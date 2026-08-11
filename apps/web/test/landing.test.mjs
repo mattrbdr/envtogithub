@@ -27,9 +27,8 @@ test('workflow keeps its copy in a full-width step column', () => {
   assert.match(page, /\.step \{ border-left:1px solid #435136; display:block;/)
 })
 
-test('installation points to published release archives instead of an unavailable tap', () => {
-  assert.match(page, /releases\/download\/v0\.1\.3/)
-  assert.match(page, /etg_0\.1\.3_darwin_arm64\.tar\.gz/)
-  assert.match(page, /Install from the latest release/)
-  assert.doesNotMatch(page, /brew tap mattrbdr\/tap/)
+test('installation uses the published Homebrew tap', () => {
+  assert.match(page, /brew tap mattrbdr\/tap/)
+  assert.match(page, /brew install etg/)
+  assert.match(page, /Install with Homebrew/)
 })

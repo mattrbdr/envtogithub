@@ -1,13 +1,8 @@
 ---
-import { ChartNoAxesColumnIncreasing, FileText, KeyRound, Monitor, RefreshCw, Search, ShieldCheck, Terminal } from '@lucide/astro';
+import { ChartNoAxesColumnIncreasing, Coffee, FileText, KeyRound, Monitor, RefreshCw, Search, ShieldCheck, Terminal } from '@lucide/astro';
 
-const downloads = [
-  ['macOS · Apple Silicon', 'etg_0.1.3_darwin_arm64.tar.gz'],
-  ['macOS · Intel', 'etg_0.1.3_darwin_amd64.tar.gz'],
-  ['Linux · ARM64', 'etg_0.1.3_linux_arm64.tar.gz'],
-  ['Linux · x86_64', 'etg_0.1.3_linux_amd64.tar.gz'],
-] as const;
-const releaseUrl = 'https://github.com/mattrbdr/envtogithub/releases/download/v0.1.3';
+const install = `brew tap mattrbdr/tap
+brew install etg`;
 
 const features = [
   ['preview', 'Preview before you push', 'Use --dry-run to review every key and value length. Secret values never leave your terminal.'],
@@ -52,7 +47,7 @@ const features = [
 
         <main id="top">
           <section class="hero">
-            <div class="eyebrow"><span class="pulse"></span> Built for macOS and Linux</div>
+            <div class="eyebrow"><span class="pulse"></span> Install with Homebrew</div>
             <h1>GitHub secrets,<br /><span class="gradient">without the guesswork.</span></h1>
             <p>etg turns a local environment file into GitHub environment secrets. Preview every change before it reaches GitHub, then sync with one command.</p>
             <div class="hero-actions"><a class="button button-primary" href="#install">Install etg <span aria-hidden="true">→</span></a><a class="button button-secondary" href="#workflow">See how it works</a></div>
@@ -67,7 +62,7 @@ const features = [
 <span class="success">✓ Nothing sent. Run etg when you are ready.</span></pre>
             </div>
             <p class="trust">Built on tools your team already trusts</p>
-            <div class="logos"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.23c0 4.52 2.87 8.36 6.84 9.71.5.1.68-.22.68-.49v-1.88c-2.78.62-3.37-1.2-3.37-1.2-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.54 1.06 1.54 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.13.64-1.39-2.22-.26-4.56-1.15-4.56-5.1 0-1.13.39-2.05 1.03-2.77-.1-.26-.45-1.32.1-2.75 0 0 .84-.27 2.75 1.06A9.3 9.3 0 0 1 12 6.1c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.06 2.74-1.06.55 1.43.2 2.49.1 2.75.64.72 1.03 1.64 1.03 2.77 0 3.96-2.34 4.83-4.57 5.09.36.32.67.91.67 1.84v2.73c0 .27.18.59.69.49A10.25 10.25 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z"/></svg>GitHub</span><span><Terminal />GitHub CLI</span><span><Monitor />macOS · Linux</span></div>
+            <div class="logos"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.23c0 4.52 2.87 8.36 6.84 9.71.5.1.68-.22.68-.49v-1.88c-2.78.62-3.37-1.2-3.37-1.2-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.54 1.06 1.54 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.13.64-1.39-2.22-.26-4.56-1.15-4.56-5.1 0-1.13.39-2.05 1.03-2.77-.1-.26-.45-1.32.1-2.75 0 0 .84-.27 2.75 1.06A9.3 9.3 0 0 1 12 6.1c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.06 2.74-1.06.55 1.43.2 2.49.1 2.75.64.72 1.03 1.64 1.03 2.77 0 3.96-2.34 4.83-4.57 5.09.36.32.67.91.67 1.84v2.73c0 .27.18.59.69.49A10.25 10.25 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z"/></svg>GitHub</span><span><Terminal />GitHub CLI</span><span><Coffee />Homebrew</span><span><Monitor />macOS · Linux</span></div>
           </section>
 
           <section class="features" id="features">
@@ -88,9 +83,7 @@ const features = [
 
       <section class="metrics" aria-label="etg guarantees"><div class="container"><div class="metrics-grid"><div class="metric"><strong>0</strong><span>Secret values logged</span></div><div class="metric"><strong>1 command</strong><span>To sync</span></div><div class="metric"><strong>100%</strong><span>Local control</span></div><div class="metric"><strong>gh native</strong><span>Authentication</span></div></div></div></section>
 
-      <section class="cta" id="install"><div class="container"><div class="kicker">Install from the latest release</div><h2>Your secrets belong in GitHub.<br /><span class="gradient">Your control stays local.</span></h2><p>Choose the archive for your operating system, extract it, then put <code>etg</code> on your path.</p><div class="download-grid">{downloads.map(([label, archive]) => <a class="download" href={`${releaseUrl}/${archive}`}><span>{label}</span><b>Download →</b></a>)}</div><pre class="install-command"><b>$</b> tar -xzf etg_0.1.3_&lt;platform&gt;.tar.gz
-<b>$</b> sudo install -m 755 etg /usr/local/bin/etg
-<b>$</b> etg help</pre><p class="install-note">Requires the <a href="https://cli.github.com/" target="_blank" rel="noreferrer">GitHub CLI</a> for authentication. Homebrew support will be listed here once its formula is published.</p></div></section>
+      <section class="cta" id="install"><div class="container"><div class="kicker">Install with Homebrew</div><h2>Your secrets belong in GitHub.<br /><span class="gradient">Your control stays local.</span></h2><p>Install etg from the official tap, then authenticate with the GitHub CLI and start with a safe preview.</p><pre class="install-command"><b>$</b> {install}</pre><p class="install-note">Requires <a href="https://brew.sh/" target="_blank" rel="noreferrer">Homebrew</a> and the <a href="https://cli.github.com/" target="_blank" rel="noreferrer">GitHub CLI</a>.</p></div></section>
 
       <footer><div class="container footer-inner"><span>etg · env to GitHub · © {new Date().getFullYear()}</span><div class="footer-links"><a href="https://cli.github.com/" target="_blank" rel="noreferrer">GitHub CLI</a><a href="https://github.com/mattrbdr/envtogithub" target="_blank" rel="noreferrer">GitHub</a></div></div></footer>
     </div>
