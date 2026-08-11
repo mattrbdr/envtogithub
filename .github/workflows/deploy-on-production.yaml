@@ -115,8 +115,14 @@ jobs:
         run: |
           set -euo pipefail
           BACKUP_NAME="etg-site-$(date +%Y%m%d-%H%M%S)"
-          echo "name=$BACKUP_NAME" >> "$GITHUB_OUTPUT"
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$CPANEL_USER@$CPANEL_HOST" << EOF
+          timeout 180s ssh \
+            -o BatchMode=yes \
+            -o ConnectTimeout=20 \
+            -o ConnectionAttempts=2 \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=2 \
+            -o StrictHostKeyChecking=no \
+            -i ~/.ssh/id_rsa "$CPANEL_USER@$CPANEL_HOST" << EOF
             set -euo pipefail
             mkdir -p "$BACKUP_PATH"
             if [ -d "$REMOTE_PATH" ]; then
@@ -125,16 +131,17 @@ jobs:
               mkdir -p "$REMOTE_PATH"
             fi
           EOF
+          echo "name=$BACKUP_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Deploy static files
         run: |
           rsync --archive --compress --delete --timeout=60 \
-            -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
+            -e "ssh -o BatchMode=yes -o ConnectTimeout=20 -o ConnectionAttempts=2 -o ServerAliveInterval=15 -o ServerAliveCountMax=2 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
             production/site/ "$CPANEL_USER@$CPANEL_HOST:/home/$CPANEL_USER/$REMOTE_PATH/"
 
       - name: Verify deployment and prune backups
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$CPANEL_USER@$CPANEL_HOST" << EOF
+          timeout 120s ssh -o BatchMode=yes -o ConnectTimeout=20 -o ConnectionAttempts=2 -o ServerAliveInterval=15 -o ServerAliveCountMax=2 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$CPANEL_USER@$CPANEL_HOST" << EOF
             set -euo pipefail
             test -f "$REMOTE_PATH/index.html"
             cd "$BACKUP_PATH"
@@ -144,7 +151,7 @@ jobs:
       - name: Roll back on failure
         if: failure() && steps.backup.outputs.name != ''
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$CPANEL_USER@$CPANEL_HOST" << EOF
+          timeout 180s ssh -o BatchMode=yes -o ConnectTimeout=20 -o ConnectionAttempts=2 -o ServerAliveInterval=15 -o ServerAliveCountMax=2 -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$CPANEL_USER@$CPANEL_HOST" << EOF
             set -euo pipefail
             BACKUP="$BACKUP_PATH/${{ steps.backup.outputs.name }}"
             if [ -d "$BACKUP" ]; then
