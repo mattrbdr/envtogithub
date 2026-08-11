@@ -10,3 +10,9 @@ test('production backup has bounded SSH execution and only enables rollback afte
   assert.match(workflow, /echo "name=\$BACKUP_NAME" >> "\$GITHUB_OUTPUT"/)
   assert.doesNotMatch(workflow, /BACKUP_NAME=.*\n\s*echo "name=\$BACKUP_NAME"[\s\S]*?timeout 180s ssh/)
 })
+
+test('production deployment verifies SSH access after whitelisting before backing up', () => {
+  assert.match(workflow, /name: Verify SSH connectivity/)
+  assert.match(workflow, /for attempt in \{1\.\.6\}/)
+  assert.match(workflow, /SSH remained unreachable after whitelisting/)
+})

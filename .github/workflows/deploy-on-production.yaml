@@ -99,9 +99,12 @@ jobs:
 
       - name: Whitelist runner IP for SSH
         run: |
-          curl --fail --silent --show-error --max-time 45 \
+          set -euo pipefail
+          WHITELIST_RESPONSE="$(curl --fail --silent --show-error --max-time 45 \
             -H "Authorization: cpanel $CPANEL_USER:$CPANEL_API_TOKEN" \
-            "https://$CPANEL_HOST:2083/execute/SshWhitelist/add?address=$RUNNER_IP&port=22"
+            "https://$CPANEL_HOST:2083/execute/SshWhitelist/add?address=$RUNNER_IP&port=22")"
+          echo "$WHITELIST_RESPONSE"
+          echo "$WHITELIST_RESPONSE" | jq -e '.result.status == 1' > /dev/null
 
       - name: Set up SSH key
         run: |
@@ -109,6 +112,30 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
+
+      - name: Verify SSH connectivity
+        run: |
+          set -euo pipefail
+          SSH_OPTIONS=(
+            -o BatchMode=yes
+            -o ConnectTimeout=15
+            -o ConnectionAttempts=1
+            -o ServerAliveInterval=15
+            -o ServerAliveCountMax=2
+            -o StrictHostKeyChecking=no
+            -i ~/.ssh/id_rsa
+          )
+
+          for attempt in {1..6}; do
+            echo "Checking SSH connectivity (attempt $attempt/6)..."
+            if timeout 20s ssh "${SSH_OPTIONS[@]}" "$CPANEL_USER@$CPANEL_HOST" true; then
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "SSH remained unreachable after whitelisting." >&2
+          exit 1
 
       - name: Back up current production site
         id: backup
