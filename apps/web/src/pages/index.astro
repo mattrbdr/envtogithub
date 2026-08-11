@@ -1,67 +1,98 @@
 ---
-const install = `brew tap mattrbdr/tap
-brew install etg`;
-const example = `# env.production.to.github
-DATABASE_URL="postgres://..."
-STRIPE_SECRET_KEY=sk_live_...`;
-const run = `gh auth login
-etg info
-etg --dry-run
-etg`;
+import { ChartNoAxesColumnIncreasing, FileText, KeyRound, Monitor, RefreshCw, Search, ShieldCheck, Terminal } from '@lucide/astro';
+
+const downloads = [
+  ['macOS · Apple Silicon', 'etg_0.1.3_darwin_arm64.tar.gz'],
+  ['macOS · Intel', 'etg_0.1.3_darwin_amd64.tar.gz'],
+  ['Linux · ARM64', 'etg_0.1.3_linux_arm64.tar.gz'],
+  ['Linux · x86_64', 'etg_0.1.3_linux_amd64.tar.gz'],
+] as const;
+const releaseUrl = 'https://github.com/mattrbdr/envtogithub/releases/download/v0.1.3';
+
+const features = [
+  ['preview', 'Preview before you push', 'Use --dry-run to review every key and value length. Secret values never leave your terminal.'],
+  ['file', 'One file, any environment', 'Map production, staging, preview, or any custom environment from the file name.'],
+  ['key', 'Uses your gh session', 'No extra account or token management. etg works with the GitHub CLI authentication you already have.'],
+  ['refresh', 'Create and update', 'Missing secrets are created; existing secrets are updated in the matching GitHub environment.'],
+  ['search', 'Inspect safely', 'List environments and secret names remotely without ever exposing sensitive values.'],
+  ['shield', 'Built for your workflow', 'Keep a safe example file in Git and keep real values where they belong: locally.'],
+] as const;
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="description" content="Sync GitHub environment secrets from a local env file." />
-    <meta name="theme-color" content="#fcfcfb" />
+    <meta name="description" content="Preview and sync GitHub environment secrets from a local env file." />
+    <meta name="theme-color" content="#10150b" />
     <title>etg — env to GitHub</title>
     <style>
-      :root { background: #fcfcfb; color: #202124; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-      * { box-sizing: border-box; } html { scroll-behavior: smooth; } body { margin: 0; }
-      main { margin: 0 auto; max-width: 760px; padding: 76px 28px 110px; }
-      a { color: #146c43; text-underline-offset: 3px; } code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-      .brand { align-items: center; color: #202124; display: flex; font-size: 1.06rem; font-weight: 750; gap: 9px; letter-spacing: -.02em; text-decoration: none; }.mark { background: #202124; border-radius: 5px; color: #fff; font-family: ui-monospace, monospace; font-size: .75rem; padding: 4px 6px; }
-      .eyebrow { color: #687076; font-size: .86rem; margin: 64px 0 15px; } h1 { font-size: clamp(2.65rem, 8vw, 4.4rem); letter-spacing: -.065em; line-height: .98; margin: 0; max-width: 650px; } .intro { color: #5b6166; font-size: 1.16rem; line-height: 1.65; margin: 25px 0 0; max-width: 620px; }
-      .links { display: flex; flex-wrap: wrap; gap: 18px; margin: 28px 0 58px; }.links a { font-size: .93rem; font-weight: 650; }.links a:first-child { background: #202124; border-radius: 6px; color: #fff; padding: 10px 14px; text-decoration: none; }
-      section { border-top: 1px solid #dedfdf; padding: 42px 0; } h2 { font-size: 1.38rem; letter-spacing: -.03em; margin: 0 0 14px; } h3 { font-size: 1rem; margin: 0 0 5px; } p { color: #555b60; line-height: 1.65; margin: 0 0 16px; } ul { color: #555b60; line-height: 1.8; margin: 0; padding-left: 20px; }
-      pre { background: #f3f4f3; border: 1px solid #e2e4e2; border-radius: 7px; color: #303437; font-size: .84rem; line-height: 1.75; margin: 20px 0 0; overflow: auto; padding: 18px; } .muted { color: #747b80; font-size: .88rem; margin-top: 14px; }
-      .steps { display: grid; gap: 23px; margin-top: 24px; }.step { display: grid; gap: 14px; grid-template-columns: 27px 1fr; }.number { color: #146c43; font-family: ui-monospace, monospace; font-size: .84rem; font-weight: 700; padding-top: 2px; }.step p { font-size: .94rem; margin: 0; }
-      .note { background: #f5faf6; border-left: 3px solid #4ba66e; color: #395443; font-size: .92rem; line-height: 1.55; margin-top: 25px; padding: 13px 15px; }.footer { color: #858b90; font-size: .82rem; padding-top: 30px; }
-      @media (max-width: 560px) { main { padding: 42px 21px 75px; }.eyebrow { margin-top: 50px; } }
+      :root { background:#10150b; color:#f4f7ee; font-family:Inter,ui-sans-serif,system-ui,sans-serif; } * { box-sizing:border-box; } html { scroll-behavior:smooth; } body { margin:0; background:#10150b; } a { color:inherit; } code,pre,.mono { font-family:"SFMono-Regular",Consolas,monospace; }
+      .shell { overflow:hidden; } .container { margin:auto; max-width:1120px; padding:0 24px; } header { align-items:center; display:flex; height:72px; justify-content:space-between; } .brand { align-items:center; display:flex; font-size:18px; font-weight:700; gap:9px; letter-spacing:-.04em; text-decoration:none; } .brand-mark { align-items:center; background:#c8f135; border-radius:6px; color:#18200d; display:inline-flex; font:800 12px monospace; height:24px; justify-content:center; width:24px; }
+      nav { display:flex; gap:25px; } nav a { color:#aeb6a1; font-size:14px; text-decoration:none; } nav a:hover { color:#f4f7ee; } .header-actions { align-items:center; display:flex; gap:14px; }.github { align-items:center; color:#dce4d1; display:flex; font-size:14px; gap:7px; text-decoration:none; }.brand-icon { height:17px; width:17px; }.button { border-radius:7px; display:inline-flex; font-size:14px; font-weight:650; justify-content:center; padding:10px 15px; text-decoration:none; transition:transform .2s,background .2s; }.button:hover { transform:translateY(-1px); }.button-primary { background:#c8f135; color:#18200d; }.button-primary:hover { background:#d8ff68; }.button-secondary { background:#1b2414; border:1px solid #435136; color:#f4f7ee; }
+      .hero { padding:100px 0 96px; text-align:center; }.eyebrow { align-items:center; background:#192111; border:1px solid #3c4b2f; border-radius:999px; color:#dce4d1; display:inline-flex; font-size:12px; gap:8px; padding:7px 12px; }.pulse { background:#c8f135; border-radius:99px; height:6px; width:6px; } h1 { font-size:clamp(47px,7.4vw,80px); letter-spacing:-.065em; line-height:1.04; margin:24px auto 0; max-width:900px; }.gradient { color:#c8f135; }.hero p { color:#aeb6a1; font-size:17px; line-height:1.7; margin:22px auto 0; max-width:610px; }.hero-actions { display:flex; gap:12px; justify-content:center; margin-top:30px; }.hero-actions .button { padding:12px 18px; }
+      .terminal { background:#151b10; border:1px solid #435136; border-radius:12px; box-shadow:0 30px 80px rgba(0,0,0,.3); margin:64px auto 0; max-width:690px; overflow:hidden; text-align:left; }.terminal-bar { align-items:center; background:#1b2414; border-bottom:1px solid #435136; display:flex; gap:6px; height:39px; padding:0 14px; }.dot { border-radius:50%; height:9px; width:9px; }.dot:nth-child(1) { background:#638154 }.dot:nth-child(2) { background:#91b66f }.dot:nth-child(3) { background:#c8f135 }.terminal-title { color:#78826d; font-size:11px; margin-left:6px; }.terminal pre { color:#aeb6a1; font-size:13px; line-height:1.85; margin:0; min-height:232px; padding:22px 24px; }.prompt,.success { color:#c8f135; }.command { color:#f4f7ee; }
+      .trust { color:#78826d; font-size:11px; letter-spacing:.12em; margin-top:46px; }.logos { align-items:center; color:#bfc8b3; display:flex; flex-wrap:wrap; font-size:15px; font-weight:650; gap:30px; justify-content:center; letter-spacing:-.03em; margin-top:19px; }.logos span { align-items:center; display:flex; gap:7px; }.logos svg { height:18px; width:18px; }
+      section { scroll-margin-top:30px; }.features { padding:96px 0 55px; }.section-intro { margin:auto; max-width:610px; text-align:center; }.kicker { color:#c8f135; font:700 11px monospace; letter-spacing:.12em; }.section-intro h2,.workflow-copy h2,.cta h2 { font-size:clamp(32px,4vw,48px); letter-spacing:-.055em; line-height:1.1; margin:15px 0; }.section-intro p,.workflow-copy p { color:#aeb6a1; line-height:1.65; margin:0; }.cards { background:#435136; border:1px solid #435136; border-radius:12px; display:grid; gap:1px; grid-template-columns:repeat(3,1fr); margin-top:47px; overflow:hidden; }.card { background:#151b10; min-height:210px; padding:28px; transition:background .2s; }.card:hover { background:#1b2414; }.icon { align-items:center; background:#263214; border-radius:8px; color:#c8f135; display:flex; height:36px; justify-content:center; width:36px; }.icon svg { fill:none; height:19px; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.8; width:19px; }.card h3 { font-size:15px; letter-spacing:-.02em; margin:21px 0 9px; }.card p { color:#aeb6a1; font-size:14px; line-height:1.6; margin:0; }
+      .workflow { align-items:center; display:grid; gap:74px; grid-template-columns:1fr 1fr; padding:100px 0; }.workflow-copy h2 { max-width:430px; }.workflow-copy p { max-width:430px; }.workflow-steps { display:grid; }.step { border-left:1px solid #435136; display:block; padding:0 0 31px 28px; position:relative; }.step:last-child { padding-bottom:0; }.step-no { align-items:center; background:#151b10; border:1px solid #526443; border-radius:50%; color:#c8f135; display:flex; font:12px monospace; height:28px; justify-content:center; left:-14px; position:absolute; top:0; width:28px; }.step h3 { font-size:15px; margin:5px 0 7px; }.step p { color:#aeb6a1; font-size:14px; line-height:1.55; margin:0; }.metrics { background:#151b10; border-bottom:1px solid #354229; border-top:1px solid #354229; padding:56px 0; }.metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); }.metric { border-right:1px solid #435136; padding:8px 28px; text-align:center; }.metric:last-child { border:0; }.metric strong { color:#f4f7ee; display:block; font-size:26px; letter-spacing:-.05em; }.metric span { color:#78826d; display:block; font-family:monospace; font-size:11px; letter-spacing:.07em; margin-top:9px; }
+      .cta { padding:120px 0; text-align:center; }.cta h2 { font-size:clamp(39px,5vw,60px); margin-left:auto; margin-right:auto; max-width:670px; }.cta p { color:#aeb6a1; line-height:1.65; margin:17px auto 25px; max-width:520px; }.download-grid { display:grid; gap:10px; grid-template-columns:repeat(2,1fr); margin:30px auto 17px; max-width:700px; text-align:left; }.download { align-items:center; background:#151b10; border:1px solid #435136; border-radius:8px; display:flex; justify-content:space-between; padding:14px 15px; text-decoration:none; transition:border-color .2s,background .2s; }.download:hover { background:#1b2414; border-color:#c8f135; }.download span { color:#f4f7ee; font-size:14px; font-weight:600; }.download b { color:#c8f135; font-size:14px; }.install-command { background:#151b10; border:1px solid #435136; border-radius:8px; color:#dce4d1; font:12px monospace; line-height:1.7; margin:17px auto 0; max-width:700px; overflow:auto; padding:14px 16px; text-align:left; }.install-command b { color:#c8f135; font-weight:500; }.install-note { color:#78826d !important; font-size:12px; margin-top:12px !important; }
+      footer { border-top:1px solid #354229; color:#78826d; font-size:13px; padding:28px 0; }.footer-inner { align-items:center; display:flex; justify-content:space-between; }.footer-links { display:flex; gap:18px; }.footer-links a { color:#aeb6a1; text-decoration:none; }.footer-links a:hover { color:#f4f7ee; }
+      @media (max-width: 720px) { nav { display:none; }.github { display:none; }.hero { padding-top: 72px; }.cards { grid-template-columns: 1fr; }.workflow { gap: 48px; grid-template-columns: 1fr; padding: 75px 0; }.metrics-grid { grid-template-columns: 1fr 1fr; row-gap: 30px; }.metric { border-right: 0; padding: 0; }.footer-inner { align-items: flex-start; flex-direction: column; gap: 14px; } }
+      @media (max-width: 420px) { .container { padding-left: 18px; padding-right:18px; }.header-actions .button { padding: 9px 11px; }.hero-actions { align-items: stretch; flex-direction: column; }.terminal pre { font-size: 11px; padding: 18px; }.logos { gap: 16px; }.metrics-grid,.download-grid { grid-template-columns: 1fr; }.metric { border-bottom: 1px solid #435136; padding-bottom: 20px; }.metric:last-child { border:0; padding-bottom:0; } }
     </style>
   </head>
   <body>
-    <main>
-      <a class="brand" href="#top"><span class="mark">$</span> etg</a>
-      <div id="top" class="eyebrow">env to GitHub</div>
-      <h1>GitHub environment secrets, without the busywork.</h1>
-      <p class="intro">etg turns a local <code>env.&lt;environment&gt;.to.github</code> file into GitHub environment secrets. Review the change, then sync it with one command.</p>
-      <div class="links"><a href="#install">Install with Homebrew</a><a href="#usage">See how it works ↓</a></div>
+    <div class="shell">
+      <div class="container">
+        <header>
+          <a class="brand" href="#top"><span class="brand-mark">$</span> etg</a>
+          <nav><a href="#features">Features</a><a href="#workflow">Workflow</a><a href="#install">Install</a></nav>
+          <div class="header-actions"><a class="github" href="https://github.com/mattrbdr/envtogithub" target="_blank" rel="noreferrer" aria-label="GitHub"><svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.23c0 4.52 2.87 8.36 6.84 9.71.5.1.68-.22.68-.49 0-.24-.01-1.04-.01-1.88-2.78.62-3.37-1.2-3.37-1.2-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.54 1.06 1.54 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.13.64-1.39-2.22-.26-4.56-1.15-4.56-5.1 0-1.13.39-2.05 1.03-2.77-.1-.26-.45-1.32.1-2.75 0 0 .84-.27 2.75 1.06A9.3 9.3 0 0 1 12 6.1c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.06 2.74-1.06.55 1.43.2 2.49.1 2.75.64.72 1.03 1.64 1.03 2.77 0 3.96-2.34 4.83-4.57 5.09.36.32.67.91.67 1.84 0 1.33-.01 2.4-.01 2.73 0 .27.18.59.69.49A10.25 10.25 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z"/></svg><span>GitHub</span></a><a class="button button-primary" href="#install">Get started</a></div>
+        </header>
 
-      <section>
-        <h2>Small, deliberate, and safe by default.</h2>
-        <ul><li>One local file for each environment: production, staging, preview, and more.</li><li><code>--dry-run</code> previews key names and value lengths—never secret values.</li><li>Built on the GitHub CLI you already use, so authentication stays simple.</li></ul>
-      </section>
+        <main id="top">
+          <section class="hero">
+            <div class="eyebrow"><span class="pulse"></span> Built for macOS and Linux</div>
+            <h1>GitHub secrets,<br /><span class="gradient">without the guesswork.</span></h1>
+            <p>etg turns a local environment file into GitHub environment secrets. Preview every change before it reaches GitHub, then sync with one command.</p>
+            <div class="hero-actions"><a class="button button-primary" href="#install">Install etg <span aria-hidden="true">→</span></a><a class="button button-secondary" href="#workflow">See how it works</a></div>
+            <div class="terminal" aria-label="etg dry-run example">
+              <div class="terminal-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="terminal-title mono">etg — zsh</span></div>
+              <pre><span class="prompt">$</span><span class="command"> etg --dry-run</span>
+<span>→ Reading env.production.to.github</span>
+<span>→ Found 4 environment secrets</span>
+<span class="success">✓ DATABASE_URL     ready to update</span>
+<span class="success">✓ STRIPE_SECRET_KEY ready to update</span>
 
-      <section id="usage">
-        <h2>How it works</h2>
-        <p>Create a local file for the environment you want to update.</p>
-        <pre>{example}</pre>
-        <div class="steps"><div class="step"><span class="number">01</span><div><h3>Preview first</h3><p>Run <code>etg --dry-run</code> to see exactly which keys are ready to sync. Nothing is sent to GitHub.</p></div></div><div class="step"><span class="number">02</span><div><h3>Sync when ready</h3><p>Run <code>etg</code>. Existing secrets are updated and missing ones are created in the matching <code>production</code> environment.</p></div></div><div class="step"><span class="number">03</span><div><h3>Inspect remotely</h3><p>Use <code>etg info</code> for available environments and <code>etg list production</code> for secret names.</p></div></div></div>
-      </section>
+<span class="success">✓ Nothing sent. Run etg when you are ready.</span></pre>
+            </div>
+            <p class="trust">Built on tools your team already trusts</p>
+            <div class="logos"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.23c0 4.52 2.87 8.36 6.84 9.71.5.1.68-.22.68-.49v-1.88c-2.78.62-3.37-1.2-3.37-1.2-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.54 1.06 1.54 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.13.64-1.39-2.22-.26-4.56-1.15-4.56-5.1 0-1.13.39-2.05 1.03-2.77-.1-.26-.45-1.32.1-2.75 0 0 .84-.27 2.75 1.06A9.3 9.3 0 0 1 12 6.1c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.06 2.74-1.06.55 1.43.2 2.49.1 2.75.64.72 1.03 1.64 1.03 2.77 0 3.96-2.34 4.83-4.57 5.09.36.32.67.91.67 1.84v2.73c0 .27.18.59.69.49A10.25 10.25 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z"/></svg>GitHub</span><span><Terminal />GitHub CLI</span><span><Monitor />macOS · Linux</span></div>
+          </section>
 
-      <section id="install">
-        <h2>Install</h2>
-        <p>Install etg with Homebrew, then connect the GitHub CLI to the account and repository you want to manage.</p>
-        <pre>{install}</pre>
-        <pre>{run}</pre>
-        <p class="muted">Requires the <a href="https://cli.github.com/" target="_blank" rel="noreferrer">GitHub CLI</a>. etg uses your active <code>gh</code> session—there is no separate account to configure.</p>
-        <div class="note">Keep real values local. <code>env.*.to.github</code> files are ignored by Git; commit a safe <code>.example</code> file instead.</div>
-      </section>
+          <section class="features" id="features">
+            <div class="section-intro"><div class="kicker">Capabilities</div><h2>Small, deliberate,<br />and safe by default.</h2><p>Everything you need to manage environment secrets, without creating another dashboard or account.</p></div>
+            <div class="cards">{features.map(([icon, title, description]) => <article class="card"><div class="icon">{icon === 'preview' && <ChartNoAxesColumnIncreasing />}{icon === 'file' && <FileText />}{icon === 'key' && <KeyRound />}{icon === 'refresh' && <RefreshCw />}{icon === 'search' && <Search />}{icon === 'shield' && <ShieldCheck />}</div><h3>{title}</h3><p>{description}</p></article>)}</div>
+          </section>
 
-      <footer class="footer">etg · env to GitHub · <a href="https://github.com/mattrbdr/envtogithub">View the project on GitHub</a></footer>
-    </main>
+          <section class="workflow" id="workflow">
+            <div class="workflow-copy"><div class="kicker">A simple workflow</div><h2>From local file to GitHub environment.</h2><p>Keep control of your secrets from the first edit to the final sync.</p></div>
+            <div class="workflow-steps">
+              <article class="step"><span class="step-no">01</span><div><h3>Define your environment</h3><p>Create an <code>env.production.to.github</code> file with the secrets your app needs.</p></div></article>
+              <article class="step"><span class="step-no">02</span><div><h3>Review the change</h3><p>Run <code>etg --dry-run</code> to see exactly what is ready to sync. Nothing is sent yet.</p></div></article>
+              <article class="step"><span class="step-no">03</span><div><h3>Sync with confidence</h3><p>Run <code>etg</code> to create or update secrets in the matching GitHub environment.</p></div></article>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <section class="metrics" aria-label="etg guarantees"><div class="container"><div class="metrics-grid"><div class="metric"><strong>0</strong><span>Secret values logged</span></div><div class="metric"><strong>1 command</strong><span>To sync</span></div><div class="metric"><strong>100%</strong><span>Local control</span></div><div class="metric"><strong>gh native</strong><span>Authentication</span></div></div></div></section>
+
+      <section class="cta" id="install"><div class="container"><div class="kicker">Install from the latest release</div><h2>Your secrets belong in GitHub.<br /><span class="gradient">Your control stays local.</span></h2><p>Choose the archive for your operating system, extract it, then put <code>etg</code> on your path.</p><div class="download-grid">{downloads.map(([label, archive]) => <a class="download" href={`${releaseUrl}/${archive}`}><span>{label}</span><b>Download →</b></a>)}</div><pre class="install-command"><b>$</b> tar -xzf etg_0.1.3_&lt;platform&gt;.tar.gz
+<b>$</b> sudo install -m 755 etg /usr/local/bin/etg
+<b>$</b> etg help</pre><p class="install-note">Requires the <a href="https://cli.github.com/" target="_blank" rel="noreferrer">GitHub CLI</a> for authentication. Homebrew support will be listed here once its formula is published.</p></div></section>
+
+      <footer><div class="container footer-inner"><span>etg · env to GitHub · © {new Date().getFullYear()}</span><div class="footer-links"><a href="https://cli.github.com/" target="_blank" rel="noreferrer">GitHub CLI</a><a href="https://github.com/mattrbdr/envtogithub" target="_blank" rel="noreferrer">GitHub</a></div></div></footer>
+    </div>
   </body>
 </html>
